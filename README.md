@@ -1,10 +1,19 @@
 # 🛡️ Cloud Honeypot & Centralized Wazuh SIEM SOC Lab
 
-A production-grade, distributed threat intelligence environment designed to capture, analyze, and visualize real-world SSH brute-force attacks and malware activity. This setup pairs an isolated Google Cloud Platform (GCP) honeypot with a local, self-hosted Wazuh SIEM stack linked over an encrypted zero-trust mesh network.
+[![Platform: GCP](https://img.shields.io/badge/Cloud-Google%20Cloud-blue?logo=googlecloud)](https://cloud.google.com)
+[![SIEM: Wazuh](https://img.shields.io/badge/SIEM-Wazuh-orange?logo=wazuh)](https://wazuh.com)
+[![Honeypot: Cowrie](https://img.shields.io/badge/Honeypot-Cowrie-green)](https://github.com/cowrie/cowrie)
+[![Security: Tailscale](https://img.shields.io/badge/Network-Tailscale-lightgrey?logo=tailscale)](https://tailscale.com)
+
+A production-grade, distributed threat intelligence environment designed to capture, analyze, and visualize real-world SSH brute-force attacks and malware activity. This project pairs an isolated Google Cloud Platform (GCP) honeypot with a local, self-hosted Wazuh SIEM stack linked over an encrypted zero-trust mesh network.
 
 ---
 
-## 🗺️ Network Topology & Architecture
+## 📋 Project Overview & Objectives
+
+As automated botnets constantly scan the public internet for exposed infrastructure, this lab was engineered to safely observe threat actor behavior without risking live production assets. By deploying a medium-interaction honeypot on the public cloud and funneling telemetry through a secure, encrypted tunnel to a centralized local SIEM, this architecture achieves complete network isolation while maintaining real-time security visibility and incident response capabilities.
+
+---
 
 ```mermaid
 flowchart LR
