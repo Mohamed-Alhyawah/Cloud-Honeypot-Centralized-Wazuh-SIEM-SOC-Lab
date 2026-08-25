@@ -54,8 +54,7 @@ flowchart LR
     class Tunnel tunnel;
     class Internet threat;
 
-
-
+```
 ## 🚀 Key Features & Technical Highlights
 
 * **Medium-Interaction Honeypot (Cowrie):** Emulates a vulnerable Linux SSH service that traps threat actors in a fake Python shell. It accepts arbitrary credentials to capture post-exploitation commands, malware downloads, and brute-force dictionaries.
