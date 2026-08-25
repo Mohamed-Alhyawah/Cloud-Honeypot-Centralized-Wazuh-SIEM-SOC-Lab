@@ -85,39 +85,42 @@ flowchart LR
 
 To parse Cowrie's custom JSON log structure and elevate events into high-priority security telemetry, custom rules were engineered in Wazuh's `local_rules.xml`:
 
+```xml
 <group name="local,cowrie,honeypot,">
-  <!-- Base rule to match Cowrie JSON logs -->
+  <!-- Base rule to match and decode Cowrie JSON logs -->
   <rule id="100001" level="3">
     <decoded_as>json</decoded_as>
     <field name="eventid">^cowrie.</field>
-    <description>Cowrie Honeypot: General Event</description>
+    <description>Cowrie Honeypot: General Event Logged</description>
   </rule>
 
-  <!-- SSH Brute Force Failure -->
+  <!-- SSH Brute Force Failure Tracking -->
   <rule id="100002" level="8">
     <if_sid>100001</if_sid>
     <field name="eventid">^cowrie.login.failed</field>
-    <description>Cowrie: Failed login attempt by $(username) using password $(password)</description>
+    <description>Cowrie: Failed SSH login attempt by user '$(username)' using password '$(password)'</description>
     <group>authentication_failed,</group>
   </rule>
 
-  <!-- SSH Login Success (Attacker Trapped in Sandbox) -->
+  <!-- Successful Breach / Sandbox Entry -->
   <rule id="100003" level="12">
     <if_sid>100001</if_sid>
     <field name="eventid">^cowrie.login.success</field>
-    <description>Cowrie: SUCCESSFUL login by $(username) with password $(password)</description>
+    <description>Cowrie: SUCCESSFUL login - Attacker inside sandbox as '$(username)' with password '$(password)'</description>
     <mitre>
       <id>T1078</id>
     </mitre>
   </rule>
 
-  <!-- Command Execution Post-Breach -->
+  <!-- Post-Exploitation Command Execution -->
   <rule id="100004" level="10">
     <if_sid>100001</if_sid>
     <field name="eventid">^cowrie.command.input</field>
-    <description>Cowrie: Attacker executed command: $(input)</description>
+    <description>Cowrie: Attacker executed terminal command: $(input)</description>
     <mitre>
       <id>T1059</id>
     </mitre>
   </rule>
 </group>
+
+```
