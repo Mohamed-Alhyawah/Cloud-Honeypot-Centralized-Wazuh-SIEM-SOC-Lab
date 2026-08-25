@@ -1,0 +1,1 @@
+# Cloud-Honeypot-Centralized-Wazuh-SIEM-SOC-Lab
