@@ -53,3 +53,63 @@ flowchart LR
     class LocalSOC soc;
     class Tunnel tunnel;
     class Internet threat;
+
+
+
+## 🚀 Key Features & Technical Highlights
+
+* **Medium-Interaction Honeypot (Cowrie):** Emulates a vulnerable Linux SSH service that traps threat actors in a fake Python shell. It accepts arbitrary credentials to capture post-exploitation commands, malware downloads, and brute-force dictionaries.
+* **Zero-Trust Network Tunneling (Tailscale):** Securely routes log streams over a WireGuard-backed mesh network from GCP to the local SIEM, keeping database ports isolated from the public internet.
+* **Custom Detection Engineering:** Engine-level custom rules (`local_rules.xml`) decode raw JSON logs and map attacker behavior directly to **MITRE ATT&CK Framework** techniques.
+* **SIEM Alerting & Analytics:** High-severity alerting for brute-force spikes, successful unauthorized logins, and terminal reconnaissance commands.
+
+
+## 🧰 Tech Stack
+
+* **Cloud Infrastructure:** Google Cloud Platform (GCP Compute Engine - Ubuntu)
+* **Honeypot Software:** Cowrie (Dockerized)
+* **SIEM Platform:** Wazuh (Manager, Indexer, Dashboard) running on Docker
+* **Network & Security:** Tailscale VPN (WireGuard protocol)
+* **Host Operating System:** Ubuntu Server
+
+
+## ⚙️ Custom SIEM Detection Rules
+
+To parse Cowrie's custom JSON log structure and elevate events into high-priority security telemetry, custom rules were engineered in Wazuh's `local_rules.xml`:
+
+<group name="local,cowrie,honeypot,">
+  <!-- Base rule to match Cowrie JSON logs -->
+  <rule id="100001" level="3">
+    <decoded_as>json</decoded_as>
+    <field name="eventid">^cowrie.</field>
+    <description>Cowrie Honeypot: General Event</description>
+  </rule>
+
+  <!-- SSH Brute Force Failure -->
+  <rule id="100002" level="8">
+    <if_sid>100001</if_sid>
+    <field name="eventid">^cowrie.login.failed</field>
+    <description>Cowrie: Failed login attempt by $(username) using password $(password)</description>
+    <group>authentication_failed,</group>
+  </rule>
+
+  <!-- SSH Login Success (Attacker Trapped in Sandbox) -->
+  <rule id="100003" level="12">
+    <if_sid>100001</if_sid>
+    <field name="eventid">^cowrie.login.success</field>
+    <description>Cowrie: SUCCESSFUL login by $(username) with password $(password)</description>
+    <mitre>
+      <id>T1078</id>
+    </mitre>
+  </rule>
+
+  <!-- Command Execution Post-Breach -->
+  <rule id="100004" level="10">
+    <if_sid>100001</if_sid>
+    <field name="eventid">^cowrie.command.input</field>
+    <description>Cowrie: Attacker executed command: $(input)</description>
+    <mitre>
+      <id>T1059</id>
+    </mitre>
+  </rule>
+</group>
